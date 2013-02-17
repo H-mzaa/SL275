@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="build" name="codemy">
+	<target name="init">
+		<echo message="-- Script Ant Cognicap Codemy --" level="info" />
+		<echo message="Basedir: ${basedir}" level="info" />
+		<echo message="Ant file: ${ant.file}" level="info" />
+		<echo message="Ant home: ${ant.home}" level="info" />
+		<echo message="${ant.version}" level="info" />
+		<echo message="${java.runtime.name}, ${java.runtime.version}" level="info" />
+		<echo message="${os.name} ${sun.os.patch.level}, ${os.arch}/${sun.arch.data.model}" level="info" />
+		<echo message="Taches possibles:" level="info" />
+		<echo message="						- build" level="info" />
+		<echo message="						- cleanBuild" level="info" />
+		<echo message="						- javadoc" level="info" />
+		<echo message="						- cleanJavadoc" level="info" />
+		<tstamp>
+			<format property="TODAY_FR" pattern="dd MMMM yyyy HH:mm:ss" locale="fr,FR" />
+		</tstamp>
+		<echo message="${TODAY_FR}" level="info" />
+		<!-- vérifications versions -->
+		<fail message="La version de Java doit être 1.5 ou plus !">
+			<condition>
+				<or>
+					<equals arg1="${ant.java.version}" arg2="1.4" />
+					<equals arg1="${ant.java.version}" arg2="1.3" />
+					<equals arg1="${ant.java.version}" arg2="1.2" />
+					<equals arg1="${ant.java.version}" arg2="1.1" />
+				</or>
+			</condition>
+		</fail>
+		<fail message="La version de Ant doit être 1.6.5 ou plus !">
+			<condition>
+				<not>
+					<or>
+						<contains string="${ant.version}" substring="1.6" />
+						<contains string="${ant.version}" substring="1.7" />
+						<contains string="${ant.version}" substring="1.8" />
+					</or>
+				</not>
+			</condition>
+		</fail>
+	</target>
+
+	<!-- Compilation -->
+	<presetdef name="myjavac">
+		<javac debug="on" deprecation="on" encoding="Cp1252" nowarn="off" />
+	</presetdef>
+
+	<target name="buildCodemy" depends="init,cleanBuild">
+		<echo message="Compilation Codemy" level="info" />
+		<myjavac srcdir="src" destdir="build" includeantruntime="false" classpath="${class.path}" />
+	</target>
+
+	<target name="build" depends="buildCodemy" />
+
+	<!-- Nettoyage des répertoires de compilation -->
+	<target name="cleanBuild" depends="init">
+		<echo message="Nettoyage des répertoires de compilation" level="info" />
+		<delete dir="build" />
+		<mkdir dir="build" />
+	</target>
+
+	<!-- Construction des javadocs -->
+	<target name="javadoc" depends="init,build">
+		<echo message="Construction des javadocs" level="info" />
+		<macrodef name="myjavadoc">
+			<attribute name="destdir" />
+			<attribute name="windowtitle" />
+			<attribute name="classpath" />
+			<element name="javadoc-elements" implicit="true" />
+			<sequential>
+				<echo message=" " level="info" />
+				<echo message="@{windowtitle}" level="info" />
+				<javadoc destdir="@{destdir}" windowtitle="@{windowtitle}" classpath="@{classpath}" encoding="Cp1252" charset="Cp1252" access="public" author="on" version="on" use="on" maxmemory="128m">
+					<doctitle>
+						<![CDATA[@{windowtitle}]]>
+					</doctitle>
+					<javadoc-elements />
+				</javadoc>
+			</sequential>
+		</macrodef>
+		<myjavadoc destdir="docs" windowtitle="codemy" classpath="$build">
+			<packageset dir="src" />
+		</myjavadoc>
+	</target>
+
+	<!-- Nettoyage des répertoires de javadoc -->
+	<target name="cleanJavadoc" depends="init">
+		<echo message="Nettoyage javadoc" level="info" />
+		<delete dir="docs" />
+	</target>
+</project>
